@@ -1,0 +1,69 @@
+application:
+  name: WanthatGo [development]
+  timezone: Asia/Jakarta
+  setting:
+    cookie:
+      domain: digitalmaterai.com
+
+    registration:
+      ## ActivationURL must match with routes 'User Register - Activate'
+      ## See source ../internal/http/routes/user_register_routes.go
+      #      activationURL: http://dev.digitalmaterai.com:8443/api/register/activate
+      activationURL: http://localhost:8080/api/register/activate
+
+      successActivationRedirectURL: https://dev.digitalmaterai.com/user/success-activation
+      failureActivationRedirectURL: https://dev.digitalmaterai.com/user/failure-activation
+
+http:
+  port: 8080
+  securePort: 8443
+  tsl: false
+  certFile: cert/fullchain1.pem
+  keyFile: cert/privkey1.pem
+
+database:
+  dialect: postgres
+  # bridge network interface
+  #host: 172.25.0.1
+  host: 192.168.33.10
+  port: 5432
+  name: digital_materai_db
+  sslMode: disable
+  user: postgres
+  password: postgres
+  open: true
+
+
+jwt:
+  url: https://www.google.com/recaptcha/api/siteverify
+  secretKey: JWT_SECRETKEY_DEVELOPMENT_RAHASIA
+  issuer: digitalmaterai.com
+  audience: users.digitalmaterai.com
+
+fileManager:
+  rootDir: ./data/files
+
+htmlRenderer:
+  templateDir: template/html
+
+peruri:
+  signing:
+    baseURL: https://apgdev.peruri.co.id:9044/gateway
+    gatewayApiKey: 9e813bec-91ad-4fea-8a4c-d32e5ff7fa08
+    defaultSystemID: PDS-RKG
+  stamping:
+    user: gerry.kurniawan@digitalmaterai.com
+    password: "#Materai1nd0"
+    profileName: emeteraicertificateSigner
+    url:
+      login: https://backendservicedev.scm.perurica.co.id/api/users/login
+      getDocumentTypes: https://stampv2dev.scm.perurica.co.id/jenisdoc
+      checkBalance: https://backendservicedev.scm.perurica.co.id/function/saldopos
+      uploadDocument: https://fileuploaddev.scm.perurica.co.id/uploaddoc2
+      generateSN: https://stampv2dev.scm.perurica.co.id/chanel/stampv2
+      stamping: https://stampservicedev.scm.perurica.co.id/keystamp/adapter/docSigningZ
+
+zenziva:
+  userKey: 311074e78bc3
+  passKey: b7451d18f08aefb9ed18a3a0
+  waRegulerUrl: https://console.zenziva.net/wareguler/api/sendWA/

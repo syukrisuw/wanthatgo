@@ -1,0 +1,1 @@
+adapter package for converting from base model to response model of http/text, json, graphql, csv, 

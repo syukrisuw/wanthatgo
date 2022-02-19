@@ -1,0 +1,1 @@
+handler = controller (to minimize the words)
