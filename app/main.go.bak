@@ -1,0 +1,137 @@
+package main
+
+import (
+	"io"
+	"log"
+	"net"
+
+	"github.com/gobwas/ws"
+)
+
+func main() {
+	ln, err := net.Listen("tcp", "localhost:8080")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for {
+		conn, err := ln.Accept()
+		if err != nil {
+			// handle error
+		}
+		_, err = ws.Upgrade(conn)
+		if err != nil {
+			// handle error
+		}
+
+		go func() {
+			defer conn.Close()
+
+			for {
+				header, err := ws.ReadHeader(conn)
+				if err != nil {
+					// handle error
+				}
+
+				payload := make([]byte, header.Length)
+				_, err = io.ReadFull(conn, payload)
+				if err != nil {
+					// handle error
+				}
+				if header.Masked {
+					ws.Cipher(payload, header.Mask, 0)
+				}
+
+				// Reset the Masked flag, server frames must not be masked as
+				// RFC6455 says.
+				header.Masked = false
+
+				if err := ws.WriteHeader(conn, header); err != nil {
+					// handle error
+				}
+				if _, err := conn.Write(payload); err != nil {
+					// handle error
+				}
+
+				if header.OpCode == ws.OpClose {
+					return
+				}
+			}
+		}()
+	}
+}
+
+// func main() {
+// 	defer func() {
+// 		if err := recover(); err != nil {
+// 			fmt.Printf("Error: %v \n", err)
+// 		}
+
+// 	}()
+// wtutil.WtTestSyncMapFibonacci()
+// time.Sleep(5000)
+// 	fmt.Println("Testing")
+// 	http.HandleFunc("/", handler)
+// 	http.HandleFunc("/ws", upgradeHandler)
+// 	log.Fatal(http.ListenAndServe(":8080", nil))
+
+// }
+
+// func handler(w http.ResponseWriter, r *http.Request) {
+// 	fmt.Printf("Method: %v Header: %v Request: %v  \n", r.Method, r.Header, r.Body)
+
+// 	fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
+// }
+
+// func upgradeHandler(w http.ResponseWriter, r *http.Request) {
+// 	fmt.Printf("Method: %v Header: %v Request: %v  \n", r.Method, r.Header, r.Body)
+// 	wsconn, err := WsHandler(w, r)
+// 	if err != nil {
+// 		fmt.Printf("WebSocket Upgrade Failed due to Error : %s", err.Error)
+// 	}
+// }
+
+// func wsHandler(w http.ResponseWriter, r *http.Request)(*Ws, error) {
+// 	hj, ok := w.(http.Hijacker)
+// 	if !ok {
+
+// 	}
+// }
+
+// func (ws *WS) Handshake() error {
+// 	hash := func(key string){
+// 		h:= sha1.New()
+// 		h.Write([]byte(key)
+// 		h.Write([]byte("TEst"))
+// 		return []byte(base64.StdEncoding.EncodeToString(h.Sum(nil)))
+// 	}(ws.header.Get("Sec-WebSocket-Key"))
+// }
+
+// func (ws *WS) Recv()(frame Frame, _ error) {
+// 	frame = Frame{}
+// 	head, err := ws.read(2)
+// 	if err !=nil {
+
+// 	}
+// }
+
+// func (ws *WS) Send(fr Frame) error {
+
+// 	data := make([]byte,2)
+// 	data[0] = 0x80 | fr.Opcode
+// 	if fr.IsFragment  {
+// 		data[0] &= 0x7F
+// 	}
+// }
+
+// func (ws *WS) Close() error {
+// 	f := Frame{}
+// 	f.Opcode = 8
+// 	f.Length = 2
+// 	f.Payload = make([]byte,2)
+// 	binary.BigEndian.PutUint16(f.Payload, ws.Status)
+// 	if err := ws.Send(f); err !=nil {
+// 		return err
+// 	}
+// 	return ws.conn.Close()
+// }

@@ -2,53 +2,72 @@ package main
 
 import (
 	"fmt"
-	"sync"
+
+	"github.com/syukrisuw/wanthatgo/internal/wtutil"
 )
 
 func main() {
-	var wg sync.WaitGroup
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Printf("Error: %v \n", err)
+		}
 
-	wthelper.syncMap.Store(0, 0)
-	wthelper.syncMap.Store(1, 1)
-	wthelper.syncMap.Store(2, 1)
-
-	manSyncMap := wthelper.ManualMap{
-		mapStore: stdMap,
-	}
-	manSyncMap.Save(0, 0)
-	manSyncMap.Save(1, 1)
-	manSyncMap.Save(2, 1)
-
-	input := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 25}
-	input2 := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 90, 98, 100}
-	input3 := []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 90, 98, 100}
-	wg.Add(len(input))
-	wg.Add(len(input2))
-	wg.Add(len(input3))
-	fmt.Println("Start,End,Duration,FibNo,FibValue,GoRoutineId")
-	idx, idy, idz := 100, 200, 300
-	for i := 0; i < len(input); i++ {
-		idx++
-		idy++
-		idz++
-		var x = input[i]
-		var y = input2[i]
-		var z = input3[i]
-		go process(idx, x, &wg)
-		go manualSyncMutex(idy, y, &wg)
-		go syncMapProcess(idz, z, &wg)
-	}
-
-	// for i := 0; i < len(input3); i++ {
-
-	// }
-
-	// for i := 0; i < len(input2); i++ {
-
-	// }
-
-	wg.Wait()
-	// time.Sleep(5000)
+	}()
+	wtutil.WtTestSyncMapFibonacci()
 }
 
-//fastest
+// func main() {
+// 	ln, err := net.Listen("tcp", "localhost:8080")
+// 	if err != nil {
+// 		// handle error
+// 	}
+
+// 	// Prepare handshake header writer from http.Header mapping.
+// 	header := ws.HandshakeHeaderHTTP(http.Header{
+// 		"X-Go-Version": []string{runtime.Version()},
+// 	})
+
+// 	u := ws.Upgrader{
+// 		OnHost: func(host []byte) error {
+// 			if string(host) == "github.com" {
+// 				return nil
+// 			}
+// 			return ws.RejectConnectionError(
+// 				ws.RejectionStatus(403),
+// 				ws.RejectionHeader(ws.HandshakeHeaderString(
+// 					"X-Want-Host: github.com\r\n",
+// 				)),
+// 			)
+// 		},
+// 		OnHeader: func(key, value []byte) error {
+// 			if string(key) != "Cookie" {
+// 				return nil
+// 			}
+// 			ok := httphead.ScanCookie(value, func(key, value []byte) bool {
+// 				// Check session here or do some other stuff with cookies.
+// 				// Maybe copy some values for future use.
+// 				return true
+// 			})
+// 			if ok {
+// 				return nil
+// 			}
+// 			return ws.RejectConnectionError(
+// 				ws.RejectionReason("bad cookie"),
+// 				ws.RejectionStatus(400),
+// 			)
+// 		},
+// 		OnBeforeUpgrade: func() (ws.HandshakeHeader, error) {
+// 			return header, nil
+// 		},
+// 	}
+// 	for {
+// 		conn, err := ln.Accept()
+// 		if err != nil {
+// 			log.Fatal(err)
+// 		}
+// 		_, err = u.Upgrade(conn)
+// 		if err != nil {
+// 			log.Printf("upgrade error: %s", err)
+// 		}
+// 	}
+// }
