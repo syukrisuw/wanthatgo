@@ -1,0 +1,73 @@
+package main
+
+import (
+	"flag"
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+
+	"gihub.com/syukrisuw/testgolang/internal/controller/userctr"
+)
+
+func index(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/" {
+		http.Error(w, "404 not found.", http.StatusNotFound)
+		return
+	}
+
+	switch r.Method {
+	case "GET":
+		http.ServeFile(w, r, "form.html")
+	case "POST":
+		// Call ParseForm() to parse the raw query and update r.PostForm and r.Form.
+		if err := r.ParseForm(); err != nil {
+			fmt.Fprintf(w, "ParseForm() err: %v", err)
+			return
+		}
+		fmt.Fprintf(w, "Post from website! r.PostFrom = %v\n", r.PostForm)
+		name := r.FormValue("name")
+		address := r.FormValue("address")
+		fmt.Fprintf(w, "Name = %s\n", name)
+		fmt.Fprintf(w, "Address = %s\n", address)
+	default:
+		fmt.Fprintf(w, "Sorry, only GET and POST methods are supported.")
+	}
+}
+func main() {
+
+	fmt.Println("Test")
+	fmt.Println(len(os.Args), os.Args)
+	wordPtr := flag.String("word", "default value", "a string for description")
+	propPtr := flag.String("prop", "default value", "a string for description")
+
+	flag.Parse()
+	fmt.Println("word:", *wordPtr)
+	fmt.Println("prop:", *propPtr)
+
+	http.HandleFunc("/", index)
+	http.HandleFunc("/user", userctr.UserCtr)
+	http.HandleFunc("/user/", userctr.UserCtrById)
+	fmt.Printf("Starting server for testing HTTP POST...\n")
+	if err := http.ListenAndServe(":8080", nil); err != nil {
+		log.Fatal(err)
+	}
+
+	// done := make(chan bool)
+	// ticker := time.NewTicker(time.Microsecond)
+
+	// go func() {
+	// 	time.Sleep(10 * time.Second) // wait for 10 seconds
+	// 	done <- true
+	// }()
+
+	// for {
+	// 	select {
+	// 	case <-done:
+	// 		ticker.Stop()
+	// 		return
+	// 	case t := <-ticker.C:
+	// 		fmt.Println("Hello !!", t)
+	// 	}
+	// }
+}
